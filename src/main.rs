@@ -1,9 +1,8 @@
 use opencv::prelude::{MatTraitConst, VideoCaptureTrait};
 
-#[derive(Default)]
 enum Message {
-    #[default]
     PressEnter,
+    UpdateFrame,
 }
 
 struct State {
@@ -24,7 +23,7 @@ impl Default for State {
 }
 
 fn boot() -> (State, iced::Task<Message>) {
-    (State::default(), iced::Task::none())
+    (State::default(), iced::Task::perform(async {()}, |_| Message::UpdateFrame))
 }
 
 fn subscription(_: &State) -> iced::Subscription<Message> {
@@ -44,6 +43,10 @@ fn subscription(_: &State) -> iced::Subscription<Message> {
 fn update(_: &mut State, message: Message) -> iced::Task<Message> {
     match message {
         Message::PressEnter => iced::exit(),
+        Message::UpdateFrame => {
+            println!("Hello, World!");
+            iced::Task::none()
+        },
     }
 }
 
