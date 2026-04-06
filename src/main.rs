@@ -1,3 +1,5 @@
+use opencv::prelude::{MatTraitConst, VideoCaptureTrait};
+
 #[derive(Default)]
 enum Message {
     #[default]
@@ -6,13 +8,18 @@ enum Message {
 
 struct State {
     camera: opencv::videoio::VideoCapture,
+    frame: opencv::core::Mat,
 }
 
 impl Default for State {
     fn default() -> Self {
-        Self {
-            camera: opencv::videoio::VideoCapture::default().unwrap(),
-        }
+        let mut camera: opencv::videoio::VideoCapture =
+            opencv::videoio::VideoCapture::default().unwrap();
+        let mut frame: opencv::core::Mat = opencv::core::Mat::default();
+        camera.read(&mut frame);
+        println!("rows = {:#x?}", frame.rows());
+        println!("cols = {:#x?}", frame.cols());
+        Self { camera, frame }
     }
 }
 
