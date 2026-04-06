@@ -1,5 +1,8 @@
 #[derive(Clone, Debug, Default)]
-struct Message();
+enum Message {
+    #[default]
+    PressEnter,
+}
 
 #[derive(Clone, Debug, Default)]
 struct State();
@@ -8,8 +11,24 @@ fn boot() -> (State, iced::Task<Message>) {
     (State::default(), iced::Task::none())
 }
 
-fn update(_: &mut State, _: Message) -> iced::Task<Message> {
-    iced::Task::none()
+fn subscription(_: &State) -> iced::Subscription<Message> {
+    iced::event::listen_with(|event, _, _| match event {
+        iced::Event::Keyboard(iced::keyboard::Event::KeyPressed { key, .. }) => {
+            match key.as_ref() {
+                iced::keyboard::Key::Named(iced::keyboard::key::Named::Enter) => {
+                    Some(Message::PressEnter)
+                }
+                _ => None,
+            }
+        }
+        _ => None,
+    })
+}
+
+fn update(_: &mut State, message: Message) -> iced::Task<Message> {
+    match message {
+        Message::PressEnter => iced::exit(),
+    }
 }
 
 fn view(_: &State) -> iced::Element<'_, Message> {
@@ -18,6 +37,7 @@ fn view(_: &State) -> iced::Element<'_, Message> {
 
 fn main() -> iced::Result {
     iced::application(boot, update, view)
+        .subscription(subscription)
         .window(iced::window::Settings {
             fullscreen: true,
             ..iced::window::Settings::default()
