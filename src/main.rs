@@ -19,7 +19,7 @@ fn view(_: &State) -> iced::Element<'_, Message> {
 fn main() -> iced::Result {
     iced::application(boot, update, view)
         .window(iced::window::Settings {
-            maximized: true,
+            fullscreen: true,
             ..iced::window::Settings::default()
         })
         .run()
