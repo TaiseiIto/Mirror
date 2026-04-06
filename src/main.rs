@@ -1,11 +1,20 @@
-#[derive(Clone, Debug, Default)]
+#[derive(Default)]
 enum Message {
     #[default]
     PressEnter,
 }
 
-#[derive(Clone, Debug, Default)]
-struct State();
+struct State {
+    camera: opencv::videoio::VideoCapture,
+}
+
+impl Default for State {
+    fn default() -> Self {
+        Self {
+            camera: opencv::videoio::VideoCapture::default().unwrap(),
+        }
+    }
+}
 
 fn boot() -> (State, iced::Task<Message>) {
     (State::default(), iced::Task::none())
