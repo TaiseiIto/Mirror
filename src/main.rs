@@ -1,4 +1,8 @@
-use opencv::prelude::{MatTraitConst, VideoCaptureTrait};
+use opencv::prelude::{
+    MatTraitConst,
+    MatTraitConstManual,
+    VideoCaptureTrait,
+}; 
 
 enum Message {
     PressEnter,
@@ -12,12 +16,9 @@ struct State {
 
 impl Default for State {
     fn default() -> Self {
-        let mut camera: opencv::videoio::VideoCapture =
+        let camera: opencv::videoio::VideoCapture =
             opencv::videoio::VideoCapture::new(0, opencv::videoio::CAP_ANY).unwrap();
-        let mut frame: opencv::core::Mat = opencv::core::Mat::default();
-        camera.read(&mut frame).unwrap();
-        println!("rows = {:#x?}", frame.rows());
-        println!("cols = {:#x?}", frame.cols());
+        let frame: opencv::core::Mat = opencv::core::Mat::default();
         Self { camera, frame }
     }
 }
@@ -40,18 +41,33 @@ fn subscription(_: &State) -> iced::Subscription<Message> {
     })
 }
 
-fn update(_: &mut State, message: Message) -> iced::Task<Message> {
+fn update(state: &mut State, message: Message) -> iced::Task<Message> {
     match message {
         Message::PressEnter => iced::exit(),
         Message::UpdateFrame => {
-            println!("Hello, World!");
+            let State {
+                camera,
+                frame,
+            } = state;
+            camera.read(frame).unwrap();
             iced::Task::none()
         },
     }
 }
 
-fn view(_: &State) -> iced::Element<'_, Message> {
-    iced::widget::column![].into()
+fn view(state: &State) -> iced::Element<'_, Message> {
+    let State {
+        camera,
+        frame,
+    } = state;
+    let image: iced::widget::image::Handle = iced::widget::image::Handle::from_rgba(frame.cols() as u32, frame.rows() as u32, frame.data_bytes().unwrap().to_vec());
+    let image: iced::widget::Image<iced::widget::image::Handle> = iced::widget::image(image);
+    iced::widget::container(image)
+        .width(iced::Length::Fill)
+        .height(iced::Length::Fill)
+        .center_x(iced::Fill)
+        .center_y(iced::Fill)
+        .into()
 }
 
 fn main() -> iced::Result {
