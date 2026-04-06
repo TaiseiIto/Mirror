@@ -48,8 +48,10 @@ fn update(state: &mut State, message: Message) -> iced::Task<Message> {
             let State { camera, image } = state;
             let mut bgr = opencv::core::Mat::default();
             camera.read(&mut bgr).unwrap();
+            let mut mirror = opencv::core::Mat::default();
+            opencv::core::flip(&bgr, &mut mirror, 1).unwrap();
             let mut rgba = opencv::core::Mat::default();
-            opencv::imgproc::cvt_color(&bgr, &mut rgba, opencv::imgproc::COLOR_BGR2RGBA, 0)
+            opencv::imgproc::cvt_color(&mirror, &mut rgba, opencv::imgproc::COLOR_BGR2RGBA, 0)
                 .unwrap();
             *image = Some(iced::widget::image::Handle::from_rgba(
                 rgba.cols() as u32,
