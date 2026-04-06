@@ -66,7 +66,10 @@ fn view(state: &State) -> iced::Element<'_, Message> {
         image: Some(image),
     } = state
     {
-        let image: iced::widget::Image<iced::widget::image::Handle> = iced::widget::image(image);
+        let image: iced::widget::Image<iced::widget::image::Handle> = iced::widget::image(image)
+            .width(iced::Length::Fill)
+            .height(iced::Length::Fill)
+            .content_fit(iced::ContentFit::Contain);
         iced::widget::container(image)
             .width(iced::Length::Fill)
             .height(iced::Length::Fill)
