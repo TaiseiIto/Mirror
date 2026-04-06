@@ -1,8 +1,4 @@
-use opencv::prelude::{
-    MatTraitConst,
-    MatTraitConstManual,
-    VideoCaptureTrait,
-}; 
+use opencv::prelude::{MatTraitConst, MatTraitConstManual, VideoCaptureTrait};
 
 enum Message {
     PressEnter,
@@ -24,7 +20,10 @@ impl Default for State {
 }
 
 fn boot() -> (State, iced::Task<Message>) {
-    (State::default(), iced::Task::perform(async {()}, |_| Message::UpdateFrame))
+    (
+        State::default(),
+        iced::Task::perform(async { () }, |_| Message::UpdateFrame),
+    )
 }
 
 fn subscription(_: &State) -> iced::Subscription<Message> {
@@ -45,22 +44,20 @@ fn update(state: &mut State, message: Message) -> iced::Task<Message> {
     match message {
         Message::PressEnter => iced::exit(),
         Message::UpdateFrame => {
-            let State {
-                camera,
-                frame,
-            } = state;
+            let State { camera, frame } = state;
             camera.read(frame).unwrap();
             iced::Task::none()
-        },
+        }
     }
 }
 
 fn view(state: &State) -> iced::Element<'_, Message> {
-    let State {
-        camera,
-        frame,
-    } = state;
-    let image: iced::widget::image::Handle = iced::widget::image::Handle::from_rgba(frame.cols() as u32, frame.rows() as u32, frame.data_bytes().unwrap().to_vec());
+    let State { camera, frame } = state;
+    let image: iced::widget::image::Handle = iced::widget::image::Handle::from_rgba(
+        frame.cols() as u32,
+        frame.rows() as u32,
+        frame.data_bytes().unwrap().to_vec(),
+    );
     let image: iced::widget::Image<iced::widget::image::Handle> = iced::widget::image(image);
     iced::widget::container(image)
         .width(iced::Length::Fill)
