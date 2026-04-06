@@ -14,9 +14,9 @@ struct State {
 impl Default for State {
     fn default() -> Self {
         let mut camera: opencv::videoio::VideoCapture =
-            opencv::videoio::VideoCapture::default().unwrap();
+            opencv::videoio::VideoCapture::new(0, opencv::videoio::CAP_ANY).unwrap();
         let mut frame: opencv::core::Mat = opencv::core::Mat::default();
-        camera.read(&mut frame);
+        camera.read(&mut frame).unwrap();
         println!("rows = {:#x?}", frame.rows());
         println!("cols = {:#x?}", frame.cols());
         Self { camera, frame }
