@@ -7,7 +7,6 @@ enum Message {
 
 struct State {
     camera: opencv::videoio::VideoCapture,
-    frame: opencv::core::Mat,
     image: Option<iced::widget::image::Handle>,
 }
 
@@ -15,13 +14,8 @@ impl Default for State {
     fn default() -> Self {
         let camera: opencv::videoio::VideoCapture =
             opencv::videoio::VideoCapture::new(0, opencv::videoio::CAP_ANY).unwrap();
-        let frame: opencv::core::Mat = opencv::core::Mat::default();
         let image: Option<iced::widget::image::Handle> = None;
-        Self {
-            camera,
-            frame,
-            image,
-        }
+        Self { camera, image }
     }
 }
 
@@ -50,14 +44,12 @@ fn update(state: &mut State, message: Message) -> iced::Task<Message> {
     match message {
         Message::PressEnter => iced::exit(),
         Message::UpdateFrame => {
-            let State {
-                camera,
-                frame,
-                image,
-            } = state;
-            camera.read(frame).unwrap();
+            let State { camera, image } = state;
+            let mut bgr = opencv::core::Mat::default();
+            camera.read(&mut bgr).unwrap();
             let mut rgba = opencv::core::Mat::default();
-            opencv::imgproc::cvt_color(frame, &mut rgba, opencv::imgproc::COLOR_BGR2RGBA, 0).unwrap();
+            opencv::imgproc::cvt_color(&bgr, &mut rgba, opencv::imgproc::COLOR_BGR2RGBA, 0)
+                .unwrap();
             *image = Some(iced::widget::image::Handle::from_rgba(
                 rgba.cols() as u32,
                 rgba.rows() as u32,
@@ -71,7 +63,6 @@ fn update(state: &mut State, message: Message) -> iced::Task<Message> {
 fn view(state: &State) -> iced::Element<'_, Message> {
     if let State {
         camera: _,
-        frame: _,
         image: Some(image),
     } = state
     {
