@@ -28,7 +28,7 @@ impl Default for State {
 fn boot() -> (State, iced::Task<Message>) {
     (
         State::default(),
-        iced::Task::perform(async { () }, |_| Message::UpdateFrame),
+        iced::Task::perform(async {}, |_| Message::UpdateFrame),
     )
 }
 
@@ -68,10 +68,11 @@ fn update(state: &mut State, message: Message) -> iced::Task<Message> {
 
 fn view(state: &State) -> iced::Element<'_, Message> {
     if let State {
-        camera,
-        frame,
+        camera: _,
+        frame: _,
         image: Some(image),
-    } = state {
+    } = state
+    {
         let image: iced::widget::Image<iced::widget::image::Handle> = iced::widget::image(image);
         iced::widget::container(image)
             .width(iced::Length::Fill)
