@@ -56,10 +56,12 @@ fn update(state: &mut State, message: Message) -> iced::Task<Message> {
                 image,
             } = state;
             camera.read(frame).unwrap();
+            let mut rgba = opencv::core::Mat::default();
+            opencv::imgproc::cvt_color(frame, &mut rgba, opencv::imgproc::COLOR_BGR2RGBA, 0).unwrap();
             *image = Some(iced::widget::image::Handle::from_rgba(
-                frame.cols() as u32,
-                frame.rows() as u32,
-                frame.data_bytes().unwrap().to_vec(),
+                rgba.cols() as u32,
+                rgba.rows() as u32,
+                rgba.data_bytes().unwrap().to_vec(),
             ));
             iced::Task::none()
         }
