@@ -8,6 +8,7 @@ enum Message {
 struct State {
     camera: opencv::videoio::VideoCapture,
     frame: opencv::core::Mat,
+    image: iced::widget::image::Handle,
 }
 
 impl Default for State {
@@ -15,7 +16,16 @@ impl Default for State {
         let camera: opencv::videoio::VideoCapture =
             opencv::videoio::VideoCapture::new(0, opencv::videoio::CAP_ANY).unwrap();
         let frame: opencv::core::Mat = opencv::core::Mat::default();
-        Self { camera, frame }
+        let image: iced::widget::image::Handle = iced::widget::image::Handle::from_rgba(
+            frame.cols() as u32,
+            frame.rows() as u32,
+            frame.data_bytes().unwrap().to_vec(),
+        );
+        Self {
+            camera,
+            frame,
+            image,
+        }
     }
 }
 
@@ -44,20 +54,28 @@ fn update(state: &mut State, message: Message) -> iced::Task<Message> {
     match message {
         Message::PressEnter => iced::exit(),
         Message::UpdateFrame => {
-            let State { camera, frame } = state;
+            let State {
+                camera,
+                frame,
+                image,
+            } = state;
             camera.read(frame).unwrap();
+            *image = iced::widget::image::Handle::from_rgba(
+                frame.cols() as u32,
+                frame.rows() as u32,
+                frame.data_bytes().unwrap().to_vec(),
+            );
             iced::Task::none()
         }
     }
 }
 
 fn view(state: &State) -> iced::Element<'_, Message> {
-    let State { camera, frame } = state;
-    let image: iced::widget::image::Handle = iced::widget::image::Handle::from_rgba(
-        frame.cols() as u32,
-        frame.rows() as u32,
-        frame.data_bytes().unwrap().to_vec(),
-    );
+    let State {
+        camera,
+        frame,
+        image,
+    } = state;
     let image: iced::widget::Image<iced::widget::image::Handle> = iced::widget::image(image);
     iced::widget::container(image)
         .width(iced::Length::Fill)
