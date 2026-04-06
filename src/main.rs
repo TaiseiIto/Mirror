@@ -20,24 +20,25 @@ impl Default for State {
 }
 
 fn boot() -> (State, iced::Task<Message>) {
-    (
-        State::default(),
-        iced::Task::perform(async {}, |_| Message::UpdateFrame),
-    )
+    (State::default(), iced::Task::none())
 }
 
 fn subscription(_: &State) -> iced::Subscription<Message> {
-    iced::event::listen_with(|event, _, _| match event {
-        iced::Event::Keyboard(iced::keyboard::Event::KeyPressed { key, .. }) => {
-            match key.as_ref() {
-                iced::keyboard::Key::Named(iced::keyboard::key::Named::Enter) => {
-                    Some(Message::PressEnter)
+    let keyboard: iced::Subscription<Message> =
+        iced::event::listen_with(|event, _, _| match event {
+            iced::Event::Keyboard(iced::keyboard::Event::KeyPressed { key, .. }) => {
+                match key.as_ref() {
+                    iced::keyboard::Key::Named(iced::keyboard::key::Named::Enter) => {
+                        Some(Message::PressEnter)
+                    }
+                    _ => None,
                 }
-                _ => None,
             }
-        }
-        _ => None,
-    })
+            _ => None,
+        });
+    let timer =
+        iced::time::every(std::time::Duration::from_millis(100)).map(|_| Message::UpdateFrame);
+    iced::Subscription::batch(vec![keyboard, timer])
 }
 
 fn update(state: &mut State, message: Message) -> iced::Task<Message> {
